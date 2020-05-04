@@ -28,6 +28,6 @@ wss.on("connection", function (ws) {
   });
 });
 
-server.listen(3000, () => console.log("running on 3000"));
+server.listen(process.env.PORT || 3000, () => console.log("running on 3000"));
 
 module.exports = app;

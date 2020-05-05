@@ -5,6 +5,7 @@ from pynput.keyboard import Key, Controller
 
 kb = Controller()
 uri = "ws://kanopy-party.herokuapp.com/"
+listening = True
 
 async def connect():
   async with websockets.connect(uri) as websocket:
@@ -12,9 +13,12 @@ async def connect():
       await websocket.send("bump")
 
     def on_press(key):
-      if str(key) == 'Key.space':
+      global listening
+      if str(key) == 'Key.space' and listening:
         print("space pressed")
         asyncio.run(push())
+      if str(key) == 'Key.esc':
+        listening = not listening
     
     listener = keyboard.Listener(on_press = on_press)
     listener.start()

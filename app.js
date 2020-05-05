@@ -7,21 +7,24 @@ const wss = new WebSocket.Server({ server });
 
 let clients = {};
 let isFirst = true;
+let count = 0;
 
 wss.on("connection", function (ws) {
   const id = isFirst ? 0 : 1;
   isFirst = !isFirst;
   clients[id] = ws;
+  count++;
   console.log("started client interval", id);
 
   ws.on("message", function () {
     console.log("got message");
-    clients[id ? 0 : 1].send("bump");
+    if (count === 2) clients[id ? 0 : 1].send("bump");
   });
 
   ws.on("close", function () {
     console.log("stopping client interval", id);
     isFirst = !id;
+    count--;
   });
 });
 

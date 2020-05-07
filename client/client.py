@@ -34,7 +34,9 @@ async def connect():
       rec = await websocket.recv()
       if listening:
         print("received: %s" % rec)
-        if rec == HEARTBEAT: continue
+        if rec == HEARTBEAT: 
+          await websocket.send(HEARTBEAT)
+          continue
         kb.press(Key[rec])
         kb.release(Key[rec])
 

@@ -26,13 +26,17 @@ wss.on("connection", function (ws) {
   console.log(`\n${id} started\n`);
 
   const heartbeat = () => {
-    console.log(`---${id} hearbeat---`);
+    console.log(`---${id} sent hearbeat---`);
     ws.send(HEARTBEAT);
   };
 
   const interval = setInterval(heartbeat, PING_INTERVAL);
 
   ws.on("message", function (rec) {
+    if (rec === HEARTBEAT) {
+      console.log(`---${id} got hearbeat---`);
+      return;
+    }
     console.log(`[${id}] GOT: ${rec}`);
     broadcast(rec);
   });

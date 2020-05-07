@@ -1,17 +1,21 @@
 import asyncio
 import websockets
+import requests 
 from pynput import keyboard
 from pynput.keyboard import Key, Controller
 
-kb = Controller()
-uri = "ws://kanopy-party.herokuapp.com/"
-listening = True
+PATH = "://kanopy-party.herokuapp.com/"
+URL = "http" + PATH
+URI = "ws" + PATH
 HEARTBEAT = "ping"
 TOGGLE_KEY = 'p'
 KEY_CODES = {'a':'left', 's':'space', 'd':'right'}
 
+kb = Controller()
+listening = True
+
 async def connect():
-  async with websockets.connect(uri) as websocket:
+  async with websockets.connect(URI) as websocket:
     async def push(key):
       print("sent: %s" % key)
       await websocket.send(key)
@@ -35,7 +39,7 @@ async def connect():
       if listening:
         print("received: %s" % rec)
         if rec == HEARTBEAT: 
-          await websocket.send(HEARTBEAT)
+          requests.get(url = URL, params = {})
           continue
         kb.press(Key[rec])
         kb.release(Key[rec])

@@ -33,10 +33,6 @@ wss.on("connection", function (ws) {
   const interval = setInterval(heartbeat, PING_INTERVAL);
 
   ws.on("message", function (rec) {
-    if (rec === HEARTBEAT) {
-      console.log(`---${id} got hearbeat---`);
-      return;
-    }
     console.log(`[${id}] GOT: ${rec}`);
     broadcast(rec);
   });

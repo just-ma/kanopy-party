@@ -3,28 +3,44 @@ const app = express();
 const server = require("http").createServer(app);
 const WebSocket = require("ws");
 
+const PING_INTERVAL = 1200000; // 20 minutes
+const HEARTBEAT = "ping";
 const wss = new WebSocket.Server({ server });
+let clients = new Map();
 
-let clients = {};
-let isFirst = true;
-let count = 0;
+const generateId = () => {
+  let id = Math.random().toString(36).substring(2);
+  return clients.has(id) ? generateId() : id;
+};
+
+const broadcast = (message) => {
+  for ([cid, cws] of Array.from(clients.entries())) {
+    console.log(`[${cid}] SENT: ${message}`);
+    cws.send(message);
+  }
+};
 
 wss.on("connection", function (ws) {
-  const id = isFirst ? 0 : 1;
-  isFirst = !isFirst;
-  clients[id] = ws;
-  count++;
-  console.log("started client interval", id);
+  const id = generateId();
+  clients.set(id, ws);
+  console.log(`\n${id} started\n`);
 
-  ws.on("message", function () {
-    console.log("got message");
-    if (count === 2) clients[id ? 0 : 1].send("bump");
+  const heartbeat = () => {
+    console.log(`---${id} hearbeat---`);
+    ws.send(HEARTBEAT);
+  };
+
+  const interval = setInterval(heartbeat, PING_INTERVAL);
+
+  ws.on("message", function (rec) {
+    console.log(`[${id}] GOT: ${rec}`);
+    broadcast(rec);
   });
 
   ws.on("close", function () {
-    console.log("stopping client interval", id);
-    isFirst = !id;
-    count--;
+    console.log(`\n${id} stopped\n`);
+    clients.delete(id);
+    clearInterval(interval);
   });
 });
 

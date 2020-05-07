@@ -36,11 +36,12 @@ async def connect():
 
     while True:
       rec = await websocket.recv()
+      if rec == HEARTBEAT: 
+        print("---heartbeat---")
+        requests.get(url = URL, params = {})
+        continue
       if listening:
         print("received: %s" % rec)
-        if rec == HEARTBEAT: 
-          requests.get(url = URL, params = {})
-          continue
         kb.press(Key[rec])
         kb.release(Key[rec])
 
